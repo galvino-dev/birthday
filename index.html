@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Adventure</title>
 <style>
-  * { box-sizing: border-box; margin:0; padding:0; font-family:"Comic Sans MS", sans-serif;}
+  * { box-sizing: border-box; margin:0; padding:0; font-family:"Comic Sans MS",sans-serif;}
   body { background:#0a0a17; color:#fff; display:flex; justify-content:center; align-items:center; min-height:100vh; overflow:hidden; transition: opacity 1s;}
   .wrap { max-width:900px; text-align:center; }
   h1 { font-size:36px; margin-bottom:16px; text-shadow:0 0 12px #ffccff;}
@@ -76,7 +76,7 @@
   @keyframes glowpulse{0%,100%{opacity:.9;}50%{opacity:1;}}
 </style>
 </head>
-<body>
+<body style="opacity:0">
 
 <div class="wrap">
   <h1>The 8 Gates Adventure</h1>
@@ -100,7 +100,19 @@
 
 <div class="confetti" id="confetti"></div>
 
+<!-- Audio -->
+<audio id="bgMusic" src="music.mp3" loop></audio>
+
 <script>
+const music = document.getElementById('bgMusic');
+music.volume = 0.35; // 35%
+
+window.addEventListener('load',()=>{
+  document.body.style.transition='opacity 1s';
+  document.body.style.opacity=1;
+  music.play().catch(()=>{});
+});
+
 const gates = [
   {id:1,text:"Let the Journey Begin"},
   {id:2,text:"Calm and Fun"},
@@ -109,7 +121,7 @@ const gates = [
   {id:5,text:"Make a Wish."},
   {id:6,text:"Your Presence Makes the World Brighter."},
   {id:7,text:"Lucky Eight"},
-  {id:8,text:"Congratulations! You made it to the final gate!."}
+  {id:8,text:"Congratulations! You made it to the final gate!"}
 ];
 
 const gateContainer = document.getElementById('gateContainer');
@@ -143,7 +155,6 @@ function openGate(id, el){
     el.classList.add('open');
     showModalFor(id);
     currentGate++;
-    // enable next gate
     const nextGate = document.querySelector(`.gate[data-id="${currentGate}"]`);
     if(nextGate) nextGate.classList.remove('disabled');
   },300);
@@ -170,13 +181,7 @@ function showModalFor(id){
   typeText(gate.text);
   if(id===8){
     setTimeout(()=> launchConfetti(40),400);
-    // pindah ke website ucapan setelah efek
-    setTimeout(()=>{
-      document.body.style.opacity = 0;
-      setTimeout(()=>{
-        window.location.href = "https://galvino-cyber.github.io/ucapan/";
-      },1000);
-    },2000);
+    setTimeout(()=> fadeOutAndRedirect("https://galvino-cyber.github.io/ucapan/"),2000);
   }
 }
 
@@ -209,7 +214,25 @@ function launchConfetti(count=30){
     setTimeout(()=>node.remove(),2600);
   }
 }
-</script>
 
+// fade out body + music + redirect
+function fadeOutAndRedirect(url){
+  const fadeDuration = 2500; // 2 detik
+  const fadeSteps = 40;
+  let step=0;
+  const bodyFadeStep = 1/fadeSteps;
+  const musicFadeStep = music.volume/fadeSteps;
+
+  const fadeInterval = setInterval(()=>{
+    step++;
+    document.body.style.opacity = Math.max(1-step*bodyFadeStep,0);
+    music.volume = Math.max(music.volume-musicFadeStep,0);
+    if(step>=fadeSteps){
+      clearInterval(fadeInterval);
+      window.location.href=url;
+    }
+  },fadeDuration/fadeSteps);
+}
+</script>
 </body>
 </html>
