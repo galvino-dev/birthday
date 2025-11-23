@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Adventure</title>
 <style>
-  * { box-sizing: border-box; margin:0; padding:0; font-family:"Comic Sans MS",sans-serif;}
+  * { box-sizing: border-box; margin:0; padding:0; font-family:"Comic Sans MS", sans-serif;}
   body { background:#0a0a17; color:#fff; display:flex; justify-content:center; align-items:center; min-height:100vh; overflow:hidden; transition: opacity 1s;}
   .wrap { max-width:900px; text-align:center; }
   h1 { font-size:36px; margin-bottom:16px; text-shadow:0 0 12px #ffccff;}
@@ -76,18 +76,19 @@
   @keyframes glowpulse{0%,100%{opacity:.9;}50%{opacity:1;}}
 </style>
 </head>
-<body style="opacity:0">
+<body>
 
 <div class="wrap">
   <h1>The 8 Gates Adventure</h1>
   <p>Buka satu per satu secara urut!</p>
 
-  <div class="gate-container" id="gateContainer">
-    <!-- Gates di-generate JS -->
-  </div>
+  <div class="gate-container" id="gateContainer"></div>
 
   <div class="hint">Buka semua gate untuk melihat hadiah utama.</div>
 </div>
+
+<!-- Audio -->
+<audio id="bgMusic" src="music.mp3" loop></audio>
 
 <!-- modal -->
 <div class="modal" id="modal">
@@ -100,19 +101,7 @@
 
 <div class="confetti" id="confetti"></div>
 
-<!-- Audio -->
-<audio id="bgMusic" src="music.mp3" loop></audio>
-
 <script>
-const music = document.getElementById('bgMusic');
-music.volume = 0.35; // 35%
-
-window.addEventListener('load',()=>{
-  document.body.style.transition='opacity 1s';
-  document.body.style.opacity=1;
-  music.play().catch(()=>{});
-});
-
 const gates = [
   {id:1,text:"Let the Journey Begin"},
   {id:2,text:"Calm and Fun"},
@@ -121,7 +110,7 @@ const gates = [
   {id:5,text:"Make a Wish."},
   {id:6,text:"Your Presence Makes the World Brighter."},
   {id:7,text:"Lucky Eight"},
-  {id:8,text:"Congratulations! You made it to the final gate!"}
+  {id:8,text:"Congratulations! You made it to the final gate!."}
 ];
 
 const gateContainer = document.getElementById('gateContainer');
@@ -130,8 +119,10 @@ const modalText = document.getElementById('modalText');
 const modalVisual = document.getElementById('modalVisual');
 const modalClose = document.getElementById('modalClose');
 const confettiWrap = document.getElementById('confetti');
+const bgAudio = document.getElementById('bgMusic');
 
 let currentGate = 1;
+let audioStarted = false;
 
 // generate gates
 for(let g of gates){
@@ -147,7 +138,22 @@ for(let g of gates){
   gateContainer.appendChild(el);
 }
 
+function startAudio() {
+  if(audioStarted) return;
+  audioStarted = true;
+  bgAudio.volume = 0;
+  bgAudio.play().catch(()=>{}); // autoplay biasanya butuh interaksi user
+  let vol = 0;
+  const fadeIn = setInterval(()=>{
+    if(vol < 0.50){
+      vol += 0.01;
+      bgAudio.volume = vol;
+    } else clearInterval(fadeIn);
+  }, 100);
+}
+
 function openGate(id, el){
+  startAudio(); // start musik saat klik pertama
   if(id!==currentGate) return; // urut
   el.classList.add('opening');
   setTimeout(()=>{
@@ -172,16 +178,32 @@ function showModalFor(id){
       const c = document.createElement('div'); c.className='candle'; box.appendChild(c);
     }
     modalVisual.appendChild(box);
-  }else if(id===7){ // glow 8
+  } else if(id===7){ // glow 8
     const e8 = document.createElement('div'); e8.className='glow-eight'; e8.textContent='8';
     modalVisual.appendChild(e8);
   }
 
   modal.classList.add('show');
   typeText(gate.text);
+
   if(id===8){
     setTimeout(()=> launchConfetti(40),400);
-    setTimeout(()=> fadeOutAndRedirect("https://galvino-cyber.github.io/ucapan/"),2000);
+    // fade out audio & page sebelum pindah web
+    setTimeout(()=>{
+      let vol = bgAudio.volume;
+      const fadeOut = setInterval(()=>{
+        if(vol>0){
+          vol -= 0.02;
+          bgAudio.volume = vol;
+        } else {
+          clearInterval(fadeOut);
+          document.body.style.opacity = 0;
+          setTimeout(()=>{
+            window.location.href = "https://galvino-cyber.github.io/ucapan/";
+          },1000);
+        }
+      },50);
+    },2000);
   }
 }
 
@@ -214,25 +236,7 @@ function launchConfetti(count=30){
     setTimeout(()=>node.remove(),2600);
   }
 }
-
-// fade out body + music + redirect
-function fadeOutAndRedirect(url){
-  const fadeDuration = 2500; // 2 detik
-  const fadeSteps = 40;
-  let step=0;
-  const bodyFadeStep = 1/fadeSteps;
-  const musicFadeStep = music.volume/fadeSteps;
-
-  const fadeInterval = setInterval(()=>{
-    step++;
-    document.body.style.opacity = Math.max(1-step*bodyFadeStep,0);
-    music.volume = Math.max(music.volume-musicFadeStep,0);
-    if(step>=fadeSteps){
-      clearInterval(fadeInterval);
-      window.location.href=url;
-    }
-  },fadeDuration/fadeSteps);
-}
 </script>
+
 </body>
 </html>
