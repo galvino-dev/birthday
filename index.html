@@ -179,7 +179,7 @@
 
 <div class="wrap">
   <h1>The 8 Gates Adventure</h1>
-  <p>Open it slowly</p>
+  <p>Open it slowly and read it carefully</p>
 
   <div class="gate-container" id="gateContainer"></div>
   <div class="hint">Buka semua gate untuk melihat hadiah utama.</div>
@@ -203,7 +203,7 @@
 // --- GLOBAL VOLUME SETUP (tambahkan di sini) ---
 let globalVolume = localStorage.getItem("globalVolume");
 if(globalVolume === null) {
-  globalVolume = 0.8; // default volume
+  globalVolume = 1; // default volume
   localStorage.setItem("globalVolume", globalVolume);
 }
 // -----------------------------------------------
@@ -254,7 +254,7 @@ function startAudio() {
   let vol = 0;
   const fadeIn = setInterval(()=>{
     if (vol < globalVolume) {
-      vol += 0.01;
+      vol += 0.2;
       bgAudio.volume = vol;
     } else {
       bgAudio.volume = globalVolume;
