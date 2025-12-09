@@ -244,34 +244,112 @@
 <!-- ======================= JAVASCRIPT ======================= -->
 <script>
 // --- GLOBAL VOLUME SETUP ---
-let globalVolume = localStorage.getItem("globalVolume");
-if(globalVolume === null) {
-  globalVolume = 1;
-  localStorage.setItem("globalVolume", globalVolume);
-} else {
-  globalVolume = parseFloat(globalVolume);
-}
-
-const volumeSlider = document.getElementById("volumeSlider");
-
-volumeSlider.value = globalVolume * 100;
-
+// -----------------------------
+// Helper: updateSliderBar
+// (pastikan ini ada sebelum dipanggil)
+// -----------------------------
 function updateSliderBar(value) {
   const percent = value;
-  volumeSlider.style.background =
-    `linear-gradient(90deg, #ff7eb3 ${percent}%, #ffffff33 ${percent}%)`;
+  const vs = document.getElementById("volumeSlider");
+  if (vs) {
+    vs.style.background =
+      `linear-gradient(90deg, #ff7eb3 ${percent}%, #ffffff33 ${percent}%)`;
+  }
 }
 
-updateSliderBar(volumeSlider.value);
+// ======== GANTI DENGAN BLOCK AUDIO INI (paste menggantikan kode audio yang lama) ========
 
-volumeSlider.addEventListener("input", () => {
-  let vol = volumeSlider.value / 100;
-  globalVolume = vol;
-  bgAudio.volume = vol;
+// Elemen audio
+const audioElement = document.getElementById('bgMusic');
 
-  localStorage.setItem("globalVolume", vol);
-  updateSliderBar(volumeSlider.value);
-});
+// Web Audio API vars
+let audioCtx = null;
+let sourceNode = null;
+let gainNode = null;
+
+// Flag untuk memastikan fade-in hanya sekali
+let audioStarted = false;
+
+// Inisialisasi AudioContext + GainNode (dipanggil setelah gesture pertama)
+function initAudioContextIfNeeded() {
+  if (audioCtx) return; // sudah diinisialisasi
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  sourceNode = audioCtx.createMediaElementSource(audioElement);
+  gainNode = audioCtx.createGain();
+  sourceNode.connect(gainNode).connect(audioCtx.destination);
+
+  // set volume dari storage (atau default 1 karena kode lama pakai 1)
+  const saved = localStorage.getItem('globalVolume');
+  const initial = saved !== null ? Number(saved) : 1;
+  gainNode.gain.value = initial;
+
+  // sync slider visual
+  const vs = document.getElementById('volumeSlider');
+  if (vs) {
+    vs.value = initial * 100;
+    updateSliderBar(vs.value);
+  }
+}
+
+// Fungsi safe untuk memulai audio — fade-in hanya sekali
+function startAudio() {
+  initAudioContextIfNeeded();
+
+  // resume audio context (autoplay policy)
+  if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume().catch(()=>{});
+  }
+
+  // Pastikan kita tidak menjalankan fade-in lebih dari sekali
+  if (audioStarted) {
+    // kalau belum diputar pastikan element diputar tanpa fade
+    audioElement.play().catch(()=>{});
+    return;
+  }
+  audioStarted = true;
+
+  // set volume 0 lalu play
+  gainNode.gain.value = 0;
+  audioElement.currentTime = audioElement.currentTime || 0;
+  audioElement.play().catch(()=>{});
+
+  // Fade-in bertahap menuju target (target berasal dari stored volume)
+  const target = Number(localStorage.getItem('globalVolume') || 1);
+  let t = 0;
+  const steps = 40; // 40 langkah
+  const stepAmount = target / steps;
+  const interval = setInterval(()=>{
+    t += 1;
+    gainNode.gain.value = Math.min(stepAmount * t, target);
+    if (t >= steps) clearInterval(interval);
+  }, 25); // total ~1s (40*25=1000ms)
+}
+
+// Fade-out menggunakan GainNode — panggil hanya saat Gate 8
+function fadeOutMusic(callback){
+  if (!gainNode) {
+    if (callback) callback();
+    return;
+  }
+  let v = gainNode.gain.value;
+  const interval = setInterval(()=>{
+    v -= 0.02;
+    gainNode.gain.value = Math.max(0, v);
+    if (v <= 0) {
+      clearInterval(interval);
+      if (callback) callback();
+    }
+  }, 50);
+}
+
+// Pastikan audio context diinisialisasi setelah gesture pertama pengguna
+document.addEventListener('click', () => {
+  initAudioContextIfNeeded();
+  // jangan langsung fade-in di click; biarkan startAudio() yang mengontrol saat buka gate 1
+}, { once: true });
+
+// ======== END OF REPLACEMENT BLOCK ========
+
 
 // =========================================================
 // ================ ORIGINAL JAVASCRIPT ====================
@@ -297,7 +375,7 @@ const confettiWrap = document.getElementById('confetti');
 const bgAudio = document.getElementById('bgMusic');
 
 let currentGate = 1;
-let audioStarted = false;
+// <-- NOTE: removed duplicate `let audioStarted = false;` here (audioStarted already declared above)
 
 for(let g of gates){
   const el = document.createElement('div');
@@ -310,24 +388,6 @@ for(let g of gates){
   flash.className = 'flash';
   el.appendChild(flash);
   gateContainer.appendChild(el);
-}
-
-function startAudio() {
-  if(audioStarted) return;
-  audioStarted = true;
-
-  bgAudio.volume = 0;
-  bgAudio.play().catch(()=>{});
-
-  const step = 0.01;
-  const interval = 20;
-  const fadeIn = setInterval(()=>{
-    if(bgAudio.volume < globalVolume){
-      bgAudio.volume = Math.min(bgAudio.volume + step, globalVolume);
-    } else {
-      clearInterval(fadeIn);
-    }
-  }, interval);
 }
 
 function openGate(id, el){
@@ -371,26 +431,17 @@ function showModalFor(id){
   modal.classList.add('show');
   typeText(gate.text);
 
-  if(id===8){
-    setTimeout(()=> launchConfetti(40),400);
+  if(id === 8){
+    setTimeout(() => launchConfetti(40), 400);
 
-    setTimeout(()=>{
-      let vol = bgAudio.volume;
-      const fadeOut = setInterval(()=>{
-        if(vol>0){
-          vol -= 0.02;
-          bgAudio.volume = vol;
-        } else {
-          clearInterval(fadeOut);
-          document.body.style.opacity = 0;
-          setTimeout(()=>{
-            window.location.href = "https://galvino-cyber.github.io/ucapan/";
-          },1000);
-        }
-      },50);
-    },2000);
+    fadeOutMusic(() => {
+      document.body.style.opacity = 0;
+      setTimeout(() => {
+        window.location.href = "https://galvino-cyber.github.io/ucapan/";
+      }, 1000);
+    });
   }
-}
+}      
 
 modalClose.addEventListener('click',()=> modal.classList.remove('show'));
 
