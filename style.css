@@ -1,8 +1,16 @@
-  * { box-sizing: border-box; margin:0; padding:0; font-family:"Comic Sans MS", sans-serif; }
+  /* CSS */
+  
+  * { 
+    box-sizing: border-box; 
+    margin:0; 
+    padding:0; 
+    font-family:"Comic Sans MS", sans-serif; 
+  }
 
   html, body { overflow-x: hidden; }
   * { max-width: 100%; }
 
+/* CSS: BODY */
   body {
     background:#0a0a17;
     color:#fff;
@@ -14,9 +22,20 @@
     transition: opacity 1s;
   }
 
-  .wrap { max-width:900px; text-align:center; }
-  h1 { font-size:36px; margin-bottom:16px; text-shadow:0 0 12px #ffccff; }
-  p { margin-bottom:24px; color:#ccc; }
+  .wrap { 
+    max-width:900px; 
+    text-align:center; 
+  }
+
+  h1 { 
+    font-size:36px; 
+    margin-bottom:16px; 
+    text-shadow:0 0 12px #ffccff; 
+  }
+
+  p { margin-bottom:24px; 
+    color:#ccc; 
+  }
 
   .gate-container {
     display:grid;
@@ -60,13 +79,21 @@
   .gate.opening .flash { opacity:1; transform:scale(1.5); }
 
   .modal {
-    position:fixed; inset:0;
-    display:flex; justify-content:center; align-items:center;
+    position:fixed; 
+    inset:0;
+    display:flex; 
+    justify-content:center; 
+    align-items:center;
     background:rgba(0,0,0,0.7);
-    opacity:0; pointer-events:none;
+    opacity:0; 
+    pointer-events:none;
     transition:opacity .3s;
   }
-  .modal.show { opacity:1; pointer-events:auto; }
+
+  .modal.show { 
+    opacity:1; 
+    pointer-events:auto; 
+  }
 
   .modal-card {
     background:linear-gradient(180deg,#111,#000);
@@ -78,22 +105,40 @@
     position:relative;
   }
 
-  #modalText { min-height:60px; line-height:1.5; font-size:18px; margin-top:12px; color:#fdfdfd; }
+  #modalText { 
+    min-height:60px; 
+    line-height:1.5; 
+    font-size:18px; 
+    margin-top:12px; 
+    color:#fdfdfd; 
+  }
 
   .btn {
-    margin-top:16px; padding:10px 18px;
-    border:none; border-radius:10px;
-    cursor:pointer; font-weight:600;
+    margin-top:16px; 
+    padding:10px 18px;
+    border:none; 
+    border-radius:10px;
+    cursor:pointer; 
+    font-weight:600;
   }
+
   .btn-primary { background:#fff;color:#111; }
 
+/* CSS: CONFETTI */
   .confetti {
-    position:fixed; inset:0;
-    pointer-events:none; z-index:1000; overflow:hidden;
+    position:fixed; 
+    inset:0;
+    pointer-events:none; 
+    z-index:1000; 
+    overflow:hidden;
   }
+
   .confetti i {
-    position:absolute; display:block;
-    width:8px; height:12px; border-radius:2px;
+    position:absolute; 
+    display:block;
+    width:8px; 
+    height:12px; 
+    border-radius:2px;
     opacity:0.95;
     transform:translateY(-20vh) rotate(0deg);
     animation:fall linear forwards;
@@ -103,12 +148,20 @@
     to { transform:translateY(120vh) rotate(540deg); opacity:1; }
   }
 
-  .candles { display:flex; justify-content:center; gap:8px; margin-bottom:12px; }
+/* CSS: CANDLES */
+  .candles { 
+    display:flex; 
+    justify-content:center; 
+    gap:8px; 
+    margin-bottom:12px; 
+  }
+
   .candle {
     width:17px; height:50px;
     background:linear-gradient(#ffe6aa,#ffb84d);
     border-radius:5px; position:relative;
   }
+
   .candle::after {
     content:"";
     position:absolute; top:-16px; left:50%; transform:translateX(-50%);
@@ -122,6 +175,7 @@
     50% { transform:translateX(-50%) scale(1.25); opacity:1; }
   }
 
+  /* CSS: GLOW EIGHT */
   .glow-eight {
     font-size:72px; font-weight:900;
     text-shadow:0 0 20px #fff,0 0 40px #ffbaff,0 0 80px #ff88ff;
@@ -144,6 +198,7 @@
     .gate-container { grid-template-columns: repeat(3, 70px); }
   }
 
+  /* CSS: WATERMARK */
   .watermark {
     position: fixed;
     bottom: 0;
@@ -157,11 +212,7 @@
     text-align: center;
   }
 
-
-/* ========================================================= */
-/* ================== SLIDER VOLUME NEON =================== */
-/* ========================================================= */
-
+  /* CSS: VOLUME SLIDER */
 #volumeBox {
   position: fixed;
   bottom: 22px;

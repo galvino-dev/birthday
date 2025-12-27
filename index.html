@@ -1,13 +1,17 @@
-<!-- ======================= HTML ======================= -->
+<!-- HyperText Markup Language -->
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Adventure</title>
+
+<!-- CSS -->
 <link rel="stylesheet" href="style.css">
 </head>
 
+<!-- HTML: BODY -->
 <body>
 <div class="wrap">
   <h1>The 8 Gates Adventure</h1>
@@ -16,11 +20,14 @@
   <div class="gate-container" id="gateContainer"></div>
   <div class="hint">If a gate is unclickable, refresh the page. Adjust your volume to enjoy. And don't skip at all</div>
 
+  <!-- HTML: WATERMARK -->
   <div class="watermark">Made with ❤️ by v</div>
 </div>
 
+<!-- HTML: MUSIC -->
 <audio id="bgMusic" src="music.mp3" loop></audio>
 
+<!-- HTML: VOLUME SLIDER -->
 <div id="volumeBox">
   <input type="range" id="volumeSlider" min="0" max="1" step="0.01">
 </div>
@@ -34,6 +41,8 @@
 </div>
 
 <div class="confetti" id="confetti"></div>
+
+<!-- JAVASCRIPT -->
 <script src="script.js"></script>
 </body>
 </html>
