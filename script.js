@@ -99,7 +99,7 @@ function fadeOutMusic(callback){
   }
   let v = gainNode.gain.value;
   const interval = setInterval(()=>{
-    v -= 0.005;
+    v -= 0.008;
     gainNode.gain.value = Math.max(0, v);
     if (v <= 0) {
       clearInterval(interval);
@@ -124,12 +124,12 @@ document.addEventListener('click', () => {
 const gates = [
   {id:1,text:"How's your day?"},
   {id:2,text:"Hope you're having a good day! Are you feeling happy today?"},
-  {id:3,text:"No matter how today feels, your smile has a way of making things a little better"},
-  {id:4,text:"With the candles glowing, take a quiet moment to think about your wish and dream"},
-  {id:5,text:"Whatever it is, your dreams are just as beautiful as the person you are 🫣"},
+  {id:3,text:"No matter how today feels, your smile has a way of making everything a little better"},
+  {id:4,text:"As the candles glow, take a moment to think about your wishes and dreams"},
+  {id:5,text:"Whatever it is, your dreams are as beautiful as who you are 🫣"},
   {id:6,text:"Being around you feels gentle, like a calm moment in a busy day"},
   {id:7,text:"Your Special Day: February 8! 🎉"},
-  {id:8,text:"Congratulations! You made it to the final gate!"}
+  {id:8,text:"Congratulations! Here's the real surprise!"}
 ];
 
 const gateContainer = document.getElementById('gateContainer');
@@ -204,7 +204,7 @@ function showModalFor(id){
       document.body.style.opacity = 0;
       setTimeout(() => {
         window.location.href = "https://galvino-cyber.github.io/ucapan/";
-      }, 4000);
+      }, 3500);
     });
   }
 }      
